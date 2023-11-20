@@ -59,7 +59,7 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
             "MyFirstOFT", // OFT name
             "MFOFT", // OFT symbol
             8, // shared decimals for your OFT **See INFO for full explanation of this**
-            "0x00000000000" // chain endpoint address
+            "0x000000000000000000000000000" // chain endpoint address
 
         );
 
@@ -104,8 +104,11 @@ In the OFT framework, setting up trusted remotes is crucial for secure cross-cha
 To initiate a transfer:
 
 **From the Source Chain**: 
+- Define your adapterParams according to your specifications. For more info on adaperParams click [here](https://layerzero.gitbook.io/docs/evm-guides/advanced/relayer-adapter-parameters).
 - Call the `estimateSendFee` function, which will return a gas quote for your token transfer.
 - Call the `sendFrom` function in your smart contract that triggers `_debitFrom`, which handles the deduction of tokens from the user's balance and initiates the cross-chain request using LayerZero's messaging system.
+
+
 
 **On the Destination Chain**: When the message is received, `_creditTo` is invoked on the destination chain, crediting the specified amount of tokens to the target address.
 

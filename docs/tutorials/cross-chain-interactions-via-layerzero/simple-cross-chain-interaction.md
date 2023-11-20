@@ -173,7 +173,7 @@ These inputs are passed into the `estimateFees` function which returns a quote. 
 
         // Run estimateFees to get your quote
 
-        const [nativeFee, zroFee] = await omnichainApp.estimateFees(dstChainId, adapterParams, message);
+        const [nativeFee, zroFee] = await omnichainApp.estimateFees(dstChainId, false, adapterParams);
         console.log(`Estimated Fees: Native - ${nativeFee}, ZRO - ${zroFee}`);
 
         // Send your message passing your nativeFee as the msg.value

@@ -8,7 +8,7 @@ Omnichain Fungible Tokens (OFTs) are a type of token built on top of Layerzero t
 
 ## Overview
 
-Transferring OFT tokens across chains involves similar steps to the basic cross-chain interaction process. However, there are specific nuances related to handling fungible tokens and their associated transactions. Here's a high-level example of how a user might send OFT tokens from Astar to Ethereum:
+Transferring OFT tokens across chains involves similar steps to the simple cross-chain interaction process. However, there are specific nuances related to handling fungible tokens and their associated transactions. Here's a high-level example of how a user might send OFT tokens from Astar to Ethereum:
 
 1. The user calls a function in the OFT contract on Astar, specifying the token amount to send and the Ethereum destination address.
 2. The contract debits the tokens from the user's balance on Astar and sends a cross-chain message to the Ethereum contract.
@@ -18,13 +18,14 @@ Transferring OFT tokens across chains involves similar steps to the basic cross-
 
 The OFT contract needs to be deployed on both the source (e.g., Astar Network) and the destination (e.g., Ethereum) chains. This process is similar to the deployment process for our simple cross-chain transaction sample. However, instead of building a new contract, we will deploy the boilerplate OFT contract provided by Layerzero's solidity examples, which provides all of the base functionality necessary to deploy an OFT on multiple chains.
 
-
-
 To initiate, set up a deployment script in your `/scripts` folder, and add constructor arguments based on the OFTV2 constructor function below:
+
+
 
 ***Solidity***
 
     ```sol
+
     constructor(
         string memory _name,
         string memory _symbol,
@@ -48,7 +49,7 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
 
     async function main() {
 
-        const YourOFT = await hre.ethers.getContractFactory("OFT");
+        const YourOFT = await hre.ethers.getContractFactory("OFTV2");
 
         const endpointAddress = "0x00000000000000000000000000000"; // Replace with the given chain's endpoint address
         
@@ -57,7 +58,7 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
         const oft = await YourOFT.deploy(
             
             "MyFirstOFT", // OFT name
-            "MFOFT", // OFT symbol
+            "MYOFT", // OFT symbol
             8, // shared decimals for your OFT **See INFO for full explanation of this**
             "0x000000000000000000000000000" // chain endpoint address
 
@@ -80,6 +81,10 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
 ***Hardhat CLI***
 
     ```bash
+    npx hardhat compile
+    ```
+
+    ```bash
     npx hardhat run scripts/deploy.js --network astarTestnet
     ```
 
@@ -97,22 +102,31 @@ Setting Decimals on EVM Chains Only: If your token is only on EVM chains and all
 
 ## Setting Trusted Remotes
 
-In the OFT framework, setting up trusted remotes is crucial for secure cross-chain transactions, mirroring the workflow in our simple cross-chain transaction model. This is achieved through the setTrustedRemoteAddress function, where you specify the remote chain ID and the address of the destination contract on both chains. This configuration ensures that your contract only accepts messages from verified sources.
+In the OFT framework, setting up trusted remotes is crucial for secure cross-chain transactions, mirroring the workflow in our simple cross-chain transaction model. This is achieved through the `setTrustedRemoteAddress` function, where you specify the remote chain ID and the address of the destination contract as a bytes array on both chains. This configuration ensures that your contract only accepts messages from verified sources.
+
+ ```sol
+    function setTrustedRemoteAddress(uint16 _remoteChainId, bytes calldata _remoteAddress) external onlyOwner {
+        trustedRemoteLookup[_remoteChainId] = abi.encodePacked(_remoteAddress, address(this));
+        emit SetTrustedRemoteAddress(_remoteChainId, _remoteAddress);
+    }
+```
 
 ## Conducting an OFT Token Transfer
 
 To initiate a transfer:
 
 **From the Source Chain**: 
-- Define your adapterParams according to your specifications. For more info on adaperParams click [here](https://layerzero.gitbook.io/docs/evm-guides/advanced/relayer-adapter-parameters).
-- Call the `estimateSendFee` function, which will return a gas quote for your token transfer.
+
+- Define your adapterParams according to your specifications. For more info on adapterParams click [here](https://layerzero.gitbook.io/docs/evm-guides/advanced/relayer-adapter-parameters).
+- Call the `estimateSendFee` function, which will return a `nativeFee` gas quote for your token transfer.
 - Call the `sendFrom` function in your smart contract that triggers `_debitFrom`, which handles the deduction of tokens from the user's balance and initiates the cross-chain request using LayerZero's messaging system.
+    - **Set the native fee as the msg.value for your `sendFrom` function.
 
 
 
 **On the Destination Chain**: When the message is received, `_creditTo` is invoked on the destination chain, crediting the specified amount of tokens to the target address.
 
-Let's compile this token transfer process into a script that sends 10 OFT tokens from the Astar Network Testnet to Sepolia with the necessary input parameters for `estimateSendFee` and `sendFrom` properly labeled:
+Let's compile this token transfer process into a script that sends 10 MYOFT tokens from the Astar Network Testnet to Sepolia with the necessary input parameters for `estimateSendFee` and `sendFrom` properly labeled:
 
 ***Javascript***
 
@@ -134,15 +148,15 @@ async function performOFTTransfer() {
     // Define the destination chain ID and recipient address
 
     const dstChainId = '101'; // Destination chain ID (example: 101)
-    const toAddress = ethers.utils.formatBytes32String("0xRecipientAddress"); // Convert recipient's address to bytes32 format
+    const toAddress = ethers.formatBytes32String("0xRecipientAddress"); // Convert recipient's address to bytes32 format
 
     // Specify the amount of tokens to be transferred
 
-    const transferAmount = ethers.utils.parseUnits("10", 8); // Transferring 10 tokens with 8 decimals (shared decimals amount)
+    const transferAmount = ethers.parseUnits("10", 8); // Transferring 10 tokens with 8 decimals (shared decimals amount)
 
     // Prepare adapter parameters for LayerZero
 
-    const adapterParams = ethers.utils.solidityPack(['uint16', 'uint256'], [1, 200000]); // Customizing LayerZero's adapter parameters
+    const adapterParams = ethers.solidityPacked(['uint16', 'uint256'], [1, 200000]); // Customizing LayerZero's adapter parameters
 
     // Estimate the fees for the cross-chain transfer
 

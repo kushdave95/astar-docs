@@ -143,6 +143,8 @@ Every cross-chain transaction has a different fee quote associated with it based
     2. Instructing the relayer to airdrop native currency to a specified wallet address
 3. `_message`: This is the message you intend to send to your destination chain and contract
 
+** Make sure the wallet you're sending funds from is properly funded!!
+
 These inputs are passed into the `estimateFees` function which returns a quote. The quote is then passed as the `msg.value` of your `send` transaction. This cross-chain transaction flow can be packaged into a script and ran via Hardhat CLI like so:
 
 ***Javascript***
@@ -164,8 +166,8 @@ These inputs are passed into the `estimateFees` function which returns a quote. 
         // Define your input parameters
 
         const abicoder = new ethers.AbiCoder()
-        const dstChainId = '101';
-        const adapterParams = ethers.utils.solidityPack(['uint16','uint256'], [1, 200000]) // Passing 200000 as a default for gas
+        const dstChainId = '101'; // Replace with the destination LayerZero chainId
+        const adapterParams = ethers.solidityPacked(['uint16','uint256'], [1, 200000]) // Passing 200000 as a default for gas
 
         // Set the content of your cross-chain message, that will be decompiled and stored on your destination contract via lzReceive
 

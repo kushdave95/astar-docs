@@ -66,7 +66,7 @@ Let's go through these steps one-by-one:
 
 - The `estimateFees` and `send` functions leverage inherited methods from LzApp to engage with the LZ endpoint. This endpoint must be defined as a parameter in the contract's constructor, as shown below:
     ```sol
-    import "@layerzerolabs/solidity-examples/blob/main/contracts/lzApp/LzApp.sol";
+    import "@layerzerolabs/contracts/LzApp.sol";
 
     contract OmnichainApp is LzApp {
 

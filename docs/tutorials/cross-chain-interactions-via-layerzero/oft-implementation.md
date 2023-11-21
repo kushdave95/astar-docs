@@ -16,25 +16,24 @@ Transferring OFT tokens across chains involves similar steps to the simple cross
 
 ## Deployment
 
-The OFT contract needs to be deployed on both the source (e.g., Astar Network) and the destination (e.g., Ethereum) chains. This process is similar to the deployment process for our simple cross-chain transaction sample. However, instead of building a new contract, we will deploy the boilerplate OFT contract provided by Layerzero's solidity examples, which provides all of the base functionality necessary to deploy an OFT on multiple chains.
+The OFT contract needs to be deployed on both the source (e.g., Astar Network) and the destination (e.g., Ethereum) chains. This process is similar to the deployment process for our simple cross-chain transaction sample. However, this time in our constructor we will mint 100 tokens to the address that deploys the contract.
 
 To initiate, set up a deployment script in your `/scripts` folder, and add constructor arguments based on the OFTV2 constructor function below:
-
-
 
 ***Solidity***
 
     ```sol
+    import "@layerzerolabs/contracts/OFTV2.sol";
 
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        uint8 _sharedDecimals,
-        address _lzEndpoint
-    ) ERC20(_name, _symbol) BaseOFTV2(_sharedDecimals, _lzEndpoint) {
-        uint8 decimals = decimals();
-        require(_sharedDecimals <= decimals, "OFT: sharedDecimals must be <= decimals");
-        ld2sdRate = 10**(decimals - _sharedDecimals);
+    contract OFT is OFTV2 {
+        constructor(
+            string memory _name,
+            string memory _symbol,
+            uint8 _sharedDecimals,
+            address _lzEndpoint
+        ) ERC20(_name, _symbol) BaseOFTV2(_sharedDecimals, _lzEndpoint) {
+            _mint(_msgSender(), 100 * 10**_localDecimals);
+        }
     }
     
     ```
@@ -51,7 +50,7 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
 
         const YourOFT = await hre.ethers.getContractFactory("OFTV2");
 
-        const endpointAddress = "0x00000000000000000000000000000"; // Replace with the given chain's endpoint address
+        const endpointAddress = "0xEndpointAddress"; // Replace with the given chain's endpoint address
         
         // Deploy the contract with the specified constructor arguments
         
@@ -60,7 +59,7 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
             "MyFirstOFT", // OFT name
             "MYOFT", // OFT symbol
             8, // shared decimals for your OFT **See INFO for full explanation of this**
-            "0x000000000000000000000000000" // chain endpoint address
+            endpointAddress // chain endpoint address
 
         );
 
@@ -77,6 +76,8 @@ To initiate, set up a deployment script in your `/scripts` folder, and add const
         process.exitCode = 1;
     });
     ```
+
+Then run the scripts in your hardhat environment:
 
 ***Hardhat CLI***
 
@@ -119,11 +120,9 @@ To initiate a transfer:
 
 - Define your adapterParams according to your specifications. For more info on adapterParams click [here](https://layerzero.gitbook.io/docs/evm-guides/advanced/relayer-adapter-parameters).
 - Call the `estimateSendFee` function, which will return a `nativeFee` gas quote for your token transfer.
+    - **Set the `nativeFee` as the msg.value for your `sendFrom` function.
 - Call the `sendFrom` function in your smart contract that triggers `_debitFrom`, which handles the deduction of tokens from the user's balance and initiates the cross-chain request using LayerZero's messaging system.
-    - **Set the native fee as the msg.value for your `sendFrom` function.
-
-
-
+   
 **On the Destination Chain**: When the message is received, `_creditTo` is invoked on the destination chain, crediting the specified amount of tokens to the target address.
 
 Let's compile this token transfer process into a script that sends 10 MYOFT tokens from the Astar Network Testnet to Sepolia with the necessary input parameters for `estimateSendFee` and `sendFrom` properly labeled:

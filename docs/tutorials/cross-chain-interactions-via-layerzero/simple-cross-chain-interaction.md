@@ -77,8 +77,9 @@ Let's go through these steps one-by-one:
     }
     ```
 
-Once your constructor is properly defined, you can deploy your contracts by: 
-1. Running the following script on both chains:
+Once your constructor is properly defined, you can deploy your contracts by running the following script with HardHat CLI: 
+
+***Javascript***
 
     ```javascript
     // deploy.js
@@ -110,7 +111,7 @@ Once your constructor is properly defined, you can deploy your contracts by:
     });
     ```
 
-2. Using Hardhat CLI:
+***Hardhat***
 
     ```bash
     npx hardhat run scripts/deploy.js --network astarTestnet
@@ -122,7 +123,7 @@ Once your constructor is properly defined, you can deploy your contracts by:
 
 ### 3. Set Trusted Remotes
 
-In the LayerZero framework, when a message is sent from the source contract on one blockchain, the destination contract on another blockchain must be pre-configured to recognize and accept messages only from a specific, trusted source contract address. This setup ensures that when the destination contract receives a message, it can authenticate that it's indeed from the correct source. Trusted remotes can be set by calling the following function:
+When a message is sent from the source contract on one blockchain, the destination contract on another blockchain must be pre-configured to recognize and accept messages only from a specific, trusted source contract address. This setup ensures that when the destination contract receives a message, it can authenticate that it's indeed from the correct source. Trusted remotes can be set by calling the following function:
 
     ```sol
     function setTrustedRemoteAddress(uint16 _remoteChainId, bytes calldata _remoteAddress) external onlyOwner {
@@ -165,12 +166,12 @@ These inputs are passed into the `estimateFees` function which returns a quote. 
 
         // Define your input parameters
 
-        const abicoder = new ethers.AbiCoder()
+        
         const dstChainId = '101'; // Replace with the destination LayerZero chainId
-        const adapterParams = ethers.solidityPacked(['uint16','uint256'], [1, 200000]) // Passing 200000 as a default for gas
+        const adapterParams = ethers.solidityPacked(['uint16','uint256'], [1, 200000]); // Passing 200000 as a default for gas
 
         // Set the content of your cross-chain message, that will be decompiled and stored on your destination contract via lzReceive
-
+        const abicoder = new ethers.AbiCoder();
         const message = abicoder.encode(["string"], ["Transaction Passed!"]);
 
         // Run estimateFees to get your quote

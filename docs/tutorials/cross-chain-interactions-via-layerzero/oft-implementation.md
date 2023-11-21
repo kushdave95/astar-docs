@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Omnichain Fungible Token (OFT) Implementation
 
-Omnichain Fungible Tokens (OFTs) are a type of token built on top of Layerzero that can exist and be transferred across multiple blockchain networks while maintaining a single, unified total supply. This is a groundbreaking feature because, traditionally, tokens are native to a single blockchain. For example, an ERC-20 token exists solely on the Ethereum network. However, OFTs break this limitation by allowing the same token to move seamlessly between different blockchains, such as Ethereum, Binance Smart Chain, and Astar.
+Omnichain Fungible Tokens (OFTs) are a type of token built on top of Layerzero that can exist and be transferred across multiple blockchain networks while maintaining a single, unified total supply. This is a groundbreaking feature because, traditionally, tokens are native to a single blockchain. For example, an ERC-20 token exists solely on the Ethereum network. However, OFTs break this limitation by allowing the same token to move seamlessly between different blockchains, such as Astar Network and Ethereum.
 
 ## Overview
 
@@ -16,7 +16,7 @@ Transferring OFT tokens across chains involves similar steps to the simple cross
 
 ## Deployment
 
-The OFT contract needs to be deployed on both the source (e.g., Astar Network) and the destination (e.g., Ethereum) chains. This process is similar to the deployment process for our simple cross-chain transaction sample. However, this time in our constructor we will mint 100 tokens to the address that deploys the contract.
+The OFT contract needs to be deployed on both the source (e.g., Astar Network) and the destination (e.g., Ethereum) chains. This process is similar to the deployment process for our simple cross-chain transaction sample. However, this time we will mint 100 tokens to the address that deploys the contract in our constructor.
 
 To initiate, set up a deployment script in your `/scripts` folder, and add constructor arguments based on the OFTV2 constructor function below:
 
@@ -103,7 +103,7 @@ Setting Decimals on EVM Chains Only: If your token is only on EVM chains and all
 
 ## Setting Trusted Remotes
 
-In the OFT framework, setting up trusted remotes is crucial for secure cross-chain transactions, mirroring the workflow in our simple cross-chain transaction model. This is achieved through the `setTrustedRemoteAddress` function, where you specify the remote chain ID and the address of the destination contract as a bytes array on both chains. This configuration ensures that your contract only accepts messages from verified sources.
+Setting up trusted remotes is crucial for secure OFT transfers, mirroring the workflow in our simple cross-chain transaction model. This is achieved through the `setTrustedRemoteAddress` function, where you specify the remote chain ID and the address of the destination contract as a bytes array on both chains. This configuration ensures that your contract only accepts transfers from verified sources.
 
  ```sol
     function setTrustedRemoteAddress(uint16 _remoteChainId, bytes calldata _remoteAddress) external onlyOwner {

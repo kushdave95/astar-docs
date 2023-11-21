@@ -57,17 +57,18 @@ Example configuration:
 
 ```javascript
 require("@nomiclabs/hardhat-ethers");
+require('dotenv').config();
 
 module.exports = {
   solidity: "0.8.4",
   networks: {
     sepolia: {
-      url: "SEPOLIA_RPC_URL",
-      accounts: ["PRIVATE_KEY"]
+      url: "process.env.SEPOLIA_RPC_URL",
+      accounts: ["process.env.PRIVATE_KEY"]
     },
     astarTestnet: {
-      url: "ASTAR_TESTNET_RPC_URL",
-      accounts: ["PRIVATE_KEY"]
+      url: "process.env.ASTAR_TESTNET_RPC_URL",
+      accounts: ["process.env.PRIVATE_KEY"]
     }
   }
 };
